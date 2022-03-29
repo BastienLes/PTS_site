@@ -97,7 +97,7 @@ function App() {
   }, [])
 
   const Home = () => {
-    return <div>Page d'accueil</div>     
+    return <div><h1>Page d'accueil</h1></div>     
   }
 
 
@@ -134,11 +134,11 @@ function App() {
 
 
   const ListMyNFTrees_redirect = () => {
-    return <div>Page d'accueil</div>     
+    return <div><h1>Page d'accueil</h1></div>     
   }
 
   const NFTreeMarket = () => {
-    return <div>Page des NFTrees en ventes</div>     
+    return <div><h1>Page des NFTrees en ventes</h1></div>     
   }
 
   const formReducer = (state, event) => {
@@ -169,7 +169,8 @@ function App() {
 
     return(
       <div className="wrapper">
-        <h1>Formulaire pour nouveau NFTree</h1>
+        <h1>Formulaire pour NFT</h1>
+        <span>Ce formulaire a pour but de nous donner des informations à propos de votre parcelle, suite à la validation de ce formulaire nous étudirons celui-ci et emmeterons un NFT possédant les informations de votre parcelle</span>
         {submitting &&
           <div>
             You are submitting the following:
@@ -182,20 +183,20 @@ function App() {
         }
         <form onSubmit={handleSubmit}>
           <fieldset class="form">
-            <label> Numéro de parcelle 
+            <label> Numéro de parcelle :
               <input name="number" onChange={handleChange}/>
             </label>
-            <label> Géolocalisation 
+            <label> Géolocalisation :
               <input name="geoloc" onChange={handleChange}/>
             </label>
-            <label> Superficie 
+            <label> Superficie :
               <input name="size" onChange={handleChange}/>
             </label>
-            <label> Horizon de coupe 
+            <label> Horizon de coupe :
               <input name="horizon" onChange={handleChange}/>
             </label>
           </fieldset>
-          <button type="submit">Submit</button>
+          <button className="buttton" type="submit">Valider</button>
         </form>
       </div>
     )
