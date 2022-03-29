@@ -23,6 +23,14 @@ a{
   text-align: left;
 }
 
+.NftreeList{
+  text-align: left;
+}
+
+.greyId{
+  background: #999999 !important;
+}
+
 .Aboutus h1{
   color: #3CA01E;
 }
@@ -37,7 +45,6 @@ img{
 	width: 100%;
 	height: 50px;
 	margin: 0px;
-	max-width: 1000px;
 	justify-content: space-evenly;
 	text-align: center;
   padding-bottom: 30px;
@@ -100,6 +107,7 @@ span{
   padding-bottom: 20px;
 }
 
+
 .cta-button {
     padding: 8px;
     border: none;
@@ -124,6 +132,7 @@ span{
 .mint-nft-button {
     background: orange;
 }
+
 
 .nav-main {
   display: flex;
@@ -190,6 +199,25 @@ fieldset {
     font-weight: 600;
     width: 250px;
     background-color: rgb(255, 255, 255);
+}
+
+.SellButton{
+  background-color: #3CA01E;
+  padding: 8px;
+  border: none;
+  border-radius: 12px;
+  min-width: 150px;
+  height: 50px;
+  margin-top: 4vh;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.SellButton:hover{
+  background-size: 100% 100%;
+  animation: spring 300ms ease-out;
+	font-weight: bold;
 }
 
 .buttton{
