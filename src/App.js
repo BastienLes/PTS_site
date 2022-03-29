@@ -110,7 +110,7 @@ function App() {
         <h1>Qui sommes nous ?</h1>
         Nous sommes trois étudiants dans une école d'ingenieur qui avions un projet à réaliser. <br /> <br />
         Andy GUERIN, ESILV A4 Majeur FINTECH <br /><br />
-        Théo EVERARE, ESILV A4 Majeur FINTECH  <br /><br />
+        Théo EVERAERE, ESILV A4 Majeur FINTECH  <br /><br />
         Bastien LESUSEUR, ESILV A4 Majeur FINTECH 
         </span>
       </div>

@@ -8,13 +8,25 @@
 	padding: 0;
 	list-style-type: none;
 }
+
 body{
-	background:rgb(160, 210, 160);
+	background:rgb(25, 27, 31);
+}
+
+a{
+  color: #D10568;
+  background-color: transparent;
+  text-decoration: none;
 }
 
 .Aboutus{
   text-align: left;
 }
+
+.Aboutus h1{
+  color: #3CA01E;
+}
+
 img{
   width: 400;
   height: 400;
@@ -80,12 +92,12 @@ li:active {
 }
 
 h1{
-  color: #000000;
+  color: #F5F5F5;
   padding-bottom: 8vh;
 }
 
 span{
-  color: #000000;
+  color: #F5F5F5;
   padding-bottom: 8vh;
 }
 
@@ -101,7 +113,7 @@ span{
 }
 
 .connect-wallet-button {
-    background: rgb(32, 129, 226);
+    background: #D10568;
 }
 
 .cta-button:hover{
@@ -127,12 +139,12 @@ span{
 }
 
 .nav * {
-  color : black !important;
+  color : #F5F5F5 !important;
   text-decoration: none;
 }
 
 .nav > li {
-  background: rgb(255, 255, 255);
+  background: rgb(25, 27, 31);
   margin : 5px 10px;
   padding : 5px;
   border-radius: 5px;
@@ -165,7 +177,7 @@ fieldset {
 }
 
 .form label{
-  color: rgb(10, 10, 10);
+  color: #F5F5F5;
   margin-top: 1vh;
   margin-bottom: 1vh;
 }
