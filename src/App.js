@@ -149,6 +149,47 @@ function App() {
     }
   }
 
+  //###
+  let NFTree_counter = 0;
+  const ShowNFTree = (id, usage) => {
+    if(usage == "market"){
+      // bouton acheter
+    } else if (usage == "myNFTree"){
+      // bouton mettre en vente
+      // bouton burn
+    }
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
+
+        // nftContrat.tokenOfOwnerByIndex(address, i).then((val) => { ListFakeNeftDesc(i, val); });
+
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
+
+    return (
+      <div class="NFTreeUnit">
+        <ul> 
+          <li>Numéro de parcelle : </li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </div>
+    )
+  }
+
 
   const ListMyNFTrees_redirect = () => {
     return <div><h1>Page d'accueil</h1></div>
@@ -158,6 +199,22 @@ function App() {
     return <div><h1>Page des NFTrees en ventes</h1></div>
   }
 
+  const SellMyNFTree = () => {
+    // mapping(uint => uint256) public sellingPrice;
+    // mapping(uint => uint256) public inSaleUntil;
+
+    const location = useLocation();
+    let path_words = location.pathname.split("/");
+    let id = path_words[path_words.length - 1];
+    return (
+    <div>
+      <h1>Page du NFTree {id}</h1>
+      <p>ShowNFTree(id)</p>
+      <form>
+      </form>
+    </div>)
+  }
+
   const formReducer = (state, event) => {
     return {
       ...state,
@@ -165,15 +222,10 @@ function App() {
     }
   }
 
-  // const NewNFTree = () => { return <div></div> }
   const NewNFTree = () => {
     const [formData, setFormData] = useReducer(formReducer, {});
     const [submitting, setSubmitting] = useState(false);
 
-    const handleSubmit = e => {
-      e.preventDefault();
-      alert('Formulaire envoyé avec : number = ' + e.target.number.value + " | geoloc = " + e.target.geoloc.value + " | size = " + e.target.size.value + " | horizon = " + e.target.horizon.value)
-    }
 
     const handleChange = e => {
       setFormData({
@@ -196,6 +248,12 @@ function App() {
         e.target.reset()
     }
 
+    const handleSubmit = e => {
+      e.preventDefault();
+      sendEmail(e)
+      alert('Formulaire envoyé avec : number = ' + e.target.number.value + " | geoloc = " + e.target.geoloc.value + " | size = " + e.target.size.value + " | horizon = " + e.target.horizon.value)
+    }
+
       return (
         <div className="wrapper">
           <h1>Formulaire pour NFT</h1>
@@ -210,7 +268,7 @@ function App() {
               </ul>
             </div>
           }
-          <form onSubmit={handleSubmit} onSubmit={sendEmail}>
+          <form onSubmit={handleSubmit}>
             <fieldset class="form">
               <label> Numéro de parcelle :
                 <input name="number" onChange={handleChange} />
@@ -256,8 +314,8 @@ function App() {
 
 
     return (
-      <div className='main-app'>
-        <BrowserRouter>
+      <BrowserRouter>
+        <div class="nav-back">
           <div class="nav-main">
             <ul class="nav">
               <li><Link to="/">Accueil</Link></li>
@@ -265,17 +323,21 @@ function App() {
               <li><Link to="/myNFTrees">Mes NFTrees</Link></li>
               <li><Link to="/newNFTree">Nouveau NFTree</Link></li>
             </ul>
-            {currentAccount ? <h1>Connected</h1> : connectWalletButton()}
+            {currentAccount ? <h1>Connecté</h1> : connectWalletButton()}
           </div>
+        </div>
+        <div className='main-app'>
           <Routes>
             <Route exact path="/" element={<Home />} />
             <Route exact path="/market/" element={<NFTreeMarket />} />
             <Route exact path="/newNFTree/" element={<NewNFTree />} />
             <Route exact path="/myNFTrees" element={<ListMyNFTrees_redirect />} />
             <Route exact path="/myNFTrees/:address" element={<ListMyNFTrees />} />
+            <Route exact path="/myNFTrees/sell/:id" element={<SellMyNFTree />} />
           </Routes>
-        </BrowserRouter>
-      </div>
+        </div>
+      </BrowserRouter>
+      
     )
 
   }

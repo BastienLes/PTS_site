@@ -35,12 +35,12 @@ img{
 ul{
 	display: flex;
 	width: 100%;
-	height: 4vh;
-	margin: auto;
+	height: 30px;
+	margin: 0px;
 	max-width: 1000px;
 	justify-content: space-between;
 	text-align: center;
-  padding-bottom: 8vh;
+  padding-bottom: 40px;
 }
 li {
 	padding: 1rem 2rem 1.15rem;
@@ -93,12 +93,12 @@ li:active {
 
 h1{
   color: #F5F5F5;
-  padding-bottom: 8vh;
+  padding-bottom: 20px;
 }
 
 span{
   color: #F5F5F5;
-  padding-bottom: 8vh;
+  padding-bottom: 20px;
 }
 
 .cta-button {
@@ -130,6 +130,8 @@ span{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  width: 80%;
+  padding:  30px 10% 0px 10%;
 }
 
 .nav {
@@ -144,7 +146,7 @@ span{
 }
 
 .nav > li {
-  background: rgb(25, 27, 31);
+  background: rgb(50, 54, 62);
   margin : 5px 10px;
   padding : 5px;
   border-radius: 5px;
@@ -192,7 +194,6 @@ fieldset {
 }
 
 .buttton{
-  color:black;
   margin-top: 4vh;
   padding: 1vh;
   border-radius: 10px;
@@ -207,4 +208,6 @@ fieldset {
 }
 
 
-
+.nav-back {
+  background:rgb(50, 54, 62);
+}
