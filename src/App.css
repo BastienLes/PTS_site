@@ -9,8 +9,17 @@
 	list-style-type: none;
 }
 body{
-	background: hsl(240, 1%, 16%);
+	background:rgb(160, 210, 160);
 }
+
+.Aboutus{
+  text-align: left;
+}
+img{
+  width: 400;
+  height: 400;
+}
+
 ul{
 	display: flex;
 	width: 100%;
@@ -34,7 +43,7 @@ li {
 li:hover {
   background-image: url('https://scottyzen.sirv.com/Images/v/button.png');
   background-size: 100% 100%;
-  color: #27262c;
+  color: #ffffff;
   animation: spring 300ms ease-out;
 	font-weight: bold;
 }
@@ -71,12 +80,12 @@ li:active {
 }
 
 h1{
-  color: #ffffff;
+  color: #000000;
   padding-bottom: 8vh;
 }
 
 span{
-  color: #ffffff;
+  color: #000000;
   padding-bottom: 8vh;
 }
 
@@ -156,7 +165,7 @@ fieldset {
 }
 
 .form label{
-  color: white;
+  color: rgb(10, 10, 10);
   margin-top: 1vh;
   margin-bottom: 1vh;
 }
