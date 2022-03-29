@@ -315,7 +315,7 @@ function App() {
     return (
       <BrowserRouter>
         <div class="nav-back">
-          <div class="nav-main">
+          <div class="nav-main nav">
             <ul class="nav">
               <li><Link to="/">Accueil</Link></li>
               <li><Link to="/market">Marché</Link></li>
