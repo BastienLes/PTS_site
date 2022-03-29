@@ -5,14 +5,14 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Routes, Link, useNavigate, useLocation } from 'react-router-dom';
 import React, { useRef } from 'react';
 import emailjs from '@emailjs/browser';
-// import Web3 from 'web3';
+//import Web3 from 'web3';
 // import Web3Provider from 'react-web3-provider';
 
 
 import NFTree_contract from './contracts/NFTree_contract_abi.json';
 const NFTree_contract_abi = NFTree_contract.abi;
 
-const NFTree_contract_address = "0x4e5b4677BF2Dc0c34457A0472583E5FB9E4d0960";
+const NFTree_contract_address = "0xfe862e541c3610cf8dd000ce96038402e65a9f63";
 
 
 let mintPrice = undefined;
@@ -192,7 +192,14 @@ function App() {
 
 
   const ListMyNFTrees_redirect = () => {
-    return <div><h1>Page d'accueil</h1></div>
+    return (
+      <div >
+        <h1>Ici, vous pouvez consulter vos NFT</h1>
+        <div className="NftreeList">
+        <span>test</span>
+        </div>
+      </div>
+    )
   }
 
   const NFTreeMarket = () => {
@@ -200,8 +207,42 @@ function App() {
   }
 
   const SellMyNFTree = () => {
+    const [formData, setFormData] = useReducer(formReducer, {});
+    const [submitting, setSubmitting] = useState(false);
     // mapping(uint => uint256) public sellingPrice;
     // mapping(uint => uint256) public inSaleUntil;
+
+    const handleChange2 = e => {
+      
+      setFormData({
+        number: e.target.number,
+        geoloc: e.target.geoloc,
+        size: e.target.size,
+        horizon: e.target.horizon,
+      });
+    }
+
+    const handleSubmit2 = e => {
+      e.preventDefault();
+      let price = e.target.SellingPrice.value * 10 ** 9;
+      let dateTs = Date.parse(e.target.inSaleUntil.value) / 1000;
+      try {
+        const { ethereum } = window;
+  
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
+          nftContrat.setOnSale(e.target.tokenId.value, price, dateTs).then((val) => {
+            alert('Votre NFT est bien en vente')
+          })
+          //function setOnSale(uint256 tokenId, uint256 price, uint256 untilDate)
+        }
+      } catch (err) {
+        console.log(err);
+      }
+      alert('Formulaire envoyé avec : SellingPrice = ' + price + " | maxSellDate = " + dateTs)
+    }
 
     const location = useLocation();
     let path_words = location.pathname.split("/");
@@ -210,6 +251,20 @@ function App() {
     <div>
       <h1>Page du NFTree {id}</h1>
       <p>{ShowNFTree(id)}</p>
+      <form onSubmit={handleSubmit2} >
+            <fieldset class="form">
+            <label> Id du Token :
+                <input className="greyId" name="tokenId" type="text" readOnly value={id} />
+              </label>
+              <label> Prix de vente de votre NFT (en ETH) :
+                <input name="SellingPrice" type="number" onChange={handleChange2} />
+              </label>
+              <label> Date de vente maximum :
+                <input name="inSaleUntil" type="datetime-local"  onChange={handleChange2} />
+              </label>
+            </fieldset>
+            <button  on className="cta-button SellButton" type="submit">Vendre mon NFT</button>
+          </form>
       
     </div>)
   }
