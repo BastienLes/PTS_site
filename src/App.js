@@ -177,7 +177,7 @@ function App() {
     return (
       <div class="NFTreeUnit">
         <ul> 
-          <li>Numéro de parcelle : </li>
+          <li>Numéro de parcelle : <div id="np_value"></div></li>
           <li></li>
           <li></li>
           <li></li>
@@ -209,9 +209,8 @@ function App() {
     return (
     <div>
       <h1>Page du NFTree {id}</h1>
-      <p>ShowNFTree(id)</p>
-      <form>
-      </form>
+      <p>{ShowNFTree(id)}</p>
+      
     </div>)
   }
 
