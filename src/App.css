@@ -13,7 +13,7 @@ body{
 	background:rgb(25, 27, 31);
 }
 
-a{
+nav a{
   color: #D10568;
   background-color: transparent;
   text-decoration: none;
@@ -37,7 +37,6 @@ img{
 	width: 100%;
 	height: 50px;
 	margin: 0px;
-	max-width: 1000px;
 	justify-content: space-evenly;
 	text-align: center;
   padding-bottom: 30px;
@@ -209,4 +208,42 @@ fieldset {
 
 .nav-back {
   background:rgb(50, 54, 62);
+}
+
+.NFTreeUnit {
+  margin : 15px;
+  padding : 30px;
+  width: 350px;
+  height: 350px;
+  border-radius: 20px;
+  background-color : lightgrey;
+}
+.NFTreeUnit li {
+  padding: 2px;
+  display: flex;
+  flex-direction: row;
+}
+
+.NFTreeUnit ul {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.buy_NFTree {
+  background-color: lightgreen;
+}
+.sell_NFTree {
+  background-color: deepskyblue;
+}
+.burn_NFTree {
+  background-color: orangered;
+}
+
+.actionButtons{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
 }

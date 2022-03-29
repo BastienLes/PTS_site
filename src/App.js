@@ -12,7 +12,7 @@ import emailjs from '@emailjs/browser';
 import NFTree_contract from './contracts/NFTree_contract_abi.json';
 const NFTree_contract_abi = NFTree_contract.abi;
 
-const NFTree_contract_address = "0x4e5b4677BF2Dc0c34457A0472583E5FB9E4d0960";
+const NFTree_contract_address = "0xfe862e541c3610cf8dd000ce96038402e65a9f63";
 
 
 let mintPrice = undefined;
@@ -138,7 +138,7 @@ function App() {
         for (let i = 0; i < total; i++) {
           let div = document.createElement("div");
           div.id = "FakeNeftList-" + i;
-          div.class = "FakeNeftList_unit";
+          div.className = "FakeNeftList_unit";
           div_p.appendChild(div)
           nftContrat.tokenOfOwnerByIndex(address, i).then((val) => { ListFakeNeftDesc(i, val); });
         }
@@ -148,15 +148,46 @@ function App() {
       console.log(err);
     }
   }
+  
+  const insertValue = (id, clss, val) => {
+    if(val == "") val = "undefined"
+    document.getElementById(id).getElementsByClassName(clss)[0].innerHTML = val;
+  }
 
-  //###
-  let NFTree_counter = 0;
+  const redirectToSell = (e) => {
+    let id = e.target.parentNode.parentNode.parentNode.parentNode.id.split("#")[1]
+    window.location.replace("./sell/" + id);
+  }
+
+  const burnNFTree = (e) => {
+    let id = e.target.parentNode.parentNode.parentNode.parentNode.id.split("#")[1]
+
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
+
+        // nftContrat.burn(id).then((val) => { insertValue(obj_id, "np_value", val) });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   const ShowNFTree = (id, usage) => {
+    let obj_id = "NFTree#" + id;
+
+    let showBuy = false;
+    let showSell = false;
+    let showBurn = false;
     if(usage == "market"){
-      // bouton acheter
+      showBuy = true;
     } else if (usage == "myNFTree"){
-      // bouton mettre en vente
-      // bouton burn
+      showSell = true;
+      showBurn = true;
     }
     try {
       const { ethereum } = window;
@@ -166,33 +197,91 @@ function App() {
         const signer = provider.getSigner();
         const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
 
-        // nftContrat.tokenOfOwnerByIndex(address, i).then((val) => { ListFakeNeftDesc(i, val); });
+        nftContrat.parcelNumber(id).then((val) => { insertValue(obj_id, "np_value", val) });
+        nftContrat.size(id).then((val) => { insertValue(obj_id, "s_value", val) });
+        nftContrat.geolocalisation(id).then((val) => { insertValue(obj_id, "geo_value", val) });
+        nftContrat.horizonCoupe(id).then((val) => { 
+          val = new Date(val)
+          val = val.toLocaleString('default', { month: 'long' }) + " " + val.getFullYear()
+          insertValue(obj_id, "hc_value", val) 
+        });
+        nftContrat.sellingPrice(id).then((val) => { insertValue(obj_id, "sell_price", val / 10 ** 9) });
+        nftContrat.inSaleUntil(id).then((val) => {
+          val = new Date(val*1000)
+          val = val.getDay() + " " + val.toLocaleString('default', { month: 'long' }) + " " + val.getFullYear()
+          insertValue(obj_id, "sell_time", val)
+        });
+        nftContrat.isOnSale(id).then((val) => { 
+          insertValue(obj_id, "sell_bool", val ? "Oui" : "Non");
+          if(!val){
+              let sell_p = document.getElementById(obj_id).getElementsByClassName("sell_price")[0];
+              sell_p.parentNode.parentNode.removeChild(sell_p.parentNode);
+
+              let sell_t = document.getElementById(obj_id).getElementsByClassName("sell_time")[0];
+              sell_t.parentNode.parentNode.removeChild(sell_t.parentNode);
+
+            if(showSell){
+              let sell_b = document.getElementById(obj_id).getElementsByClassName("sell_NFTree")[0];
+              sell_b.parentNode.parentNode.removeChild(sell_b.parentNode);
+            }
+          }
+        });
+
+        nftContrat.ownerOf(id).then((val) => { 
+          if(showSell && val != currentAccount){
+            try {
+              let sell_b = document.getElementById(obj_id).getElementsByClassName("sell_NFTree")[0];
+              sell_b.parentNode.parentNode.removeChild(sell_b.parentNode);
+            } catch {}
+          }
+        })
+
+        nftContrat.firstOwner(id).then((val) => { 
+          if(showBurn && val != currentAccount){
+            try {
+              let burn_b = document.getElementById(obj_id).getElementsByClassName("burn_NFTree")[0];
+              burn_b.parentNode.parentNode.removeChild(burn_b.parentNode);
+            } catch {}
+          }
+        })
 
       }
+      
     } catch (err) {
       console.log(err);
     }
 
-
     return (
-      <div class="NFTreeUnit">
+      <fieldset className="NFTreeUnit" id={obj_id}>
         <ul> 
-          <li>Numéro de parcelle : <div id="np_value"></div></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
+          <div>
+            <li>Numéro de parcelle :&nbsp;<div className="np_value"></div></li>
+            <li>Taille de la parcelle (en km2) :&nbsp;<div className="s_value"></div></li>
+            <li>Geolocalisation :&nbsp;<div className="geo_value"></div></li>
+            <li>Horizon de coupe :&nbsp;<div className="hc_value"></div></li>
+            <li>Parcelle en vente ? :&nbsp;<div className="sell_bool"></div></li>
+            <li>Prix de vente : &nbsp;<div className="sell_price"></div></li>
+            <li>En vente jusuq'au :&nbsp;<div className="sell_time"></div></li>
+          </div>
+          <div className="actionButtons">
+            {showSell ? <li><button type="button" className="cta-button sell_NFTree" onClick={redirectToSell}>Vendre</button></li> : ""}
+            {showBurn ? <li><button type="button" className="cta-button burn_NFTree">Burn</button></li> : ""}
+            {showBuy ? <li><button type="button" className="cta-button buy_NFTree">Acheter</button></li> : ""}
+          </div>
+          {}
         </ul>
-      </div>
+      </fieldset>
     )
   }
 
 
   const ListMyNFTrees_redirect = () => {
-    return <div><h1>Page d'accueil</h1></div>
+    if(!currentAccount){
+      alert("Please connect yourself with the button on the top-right hand corner")
+      window.location.replace("../");
+    } else {
+      window.location.replace("./" + currentAccount);
+    }
   }
 
   const NFTreeMarket = () => {
@@ -209,7 +298,7 @@ function App() {
     return (
     <div>
       <h1>Page du NFTree {id}</h1>
-      <p>{ShowNFTree(id)}</p>
+      <div>{ShowNFTree(id, "none")}</div>
       
     </div>)
   }
@@ -268,7 +357,7 @@ function App() {
             </div>
           }
           <form onSubmit={handleSubmit}>
-            <fieldset class="form">
+            <fieldset className="form">
               <label> Numéro de parcelle :
                 <input name="number" onChange={handleChange} />
               </label>
@@ -314,9 +403,9 @@ function App() {
 
     return (
       <BrowserRouter>
-        <div class="nav-back">
-          <div class="nav-main nav">
-            <ul class="nav">
+        <div className="nav-back">
+          <div className="nav-main nav">
+            <ul className="nav">
               <li><Link to="/">Accueil</Link></li>
               <li><Link to="/market">Marché</Link></li>
               <li><Link to="/myNFTrees">Mes NFTrees</Link></li>
