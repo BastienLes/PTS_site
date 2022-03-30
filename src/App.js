@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Routes, Link, useNavigate, useLocation } from 'react-router-dom';
 import React, { useRef } from 'react';
 import emailjs from '@emailjs/browser';
-// import Web3 from 'web3';
+//import Web3 from 'web3';
 // import Web3Provider from 'react-web3-provider';
 
 
@@ -47,6 +47,7 @@ function App() {
     }
 
   }
+  connectWalletHandler()
 
 
   const W_NewNFT = (val) => {
@@ -151,7 +152,9 @@ function App() {
   
   const insertValue = (id, clss, val) => {
     if(val == "") val = "undefined"
-    document.getElementById(id).getElementsByClassName(clss)[0].innerHTML = val;
+    try{
+      document.getElementById(id).getElementsByClassName(clss)[0].innerHTML = val;
+    } catch {}
   }
 
   const redirectToSell = (e) => {
@@ -177,7 +180,7 @@ function App() {
     }
   }
 
-  const ShowNFTree = (id, usage) => {
+  const ShowNFTree = (id, usage, onlyBuyable = false, onlyAddress = "ALL") => {
     let obj_id = "NFTree#" + id;
 
     let showBuy = false;
@@ -185,7 +188,7 @@ function App() {
     let showBurn = false;
     if(usage == "market"){
       showBuy = true;
-    } else if (usage == "myNFTree"){
+    } else if (usage == "myNFTrees"){
       showSell = true;
       showBurn = true;
     }
@@ -212,31 +215,40 @@ function App() {
           insertValue(obj_id, "sell_time", val)
         });
         nftContrat.isOnSale(id).then((val) => { 
-          insertValue(obj_id, "sell_bool", val ? "Oui" : "Non");
-          if(!val){
-              let sell_p = document.getElementById(obj_id).getElementsByClassName("sell_price")[0];
-              sell_p.parentNode.parentNode.removeChild(sell_p.parentNode);
+          try{
+            insertValue(obj_id, "sell_bool", val ? "Oui" : "Non");
+            if(!val){
+                let sell_p = document.getElementById(obj_id).getElementsByClassName("sell_price")[0];
+                sell_p.parentNode.parentNode.removeChild(sell_p.parentNode);
 
-              let sell_t = document.getElementById(obj_id).getElementsByClassName("sell_time")[0];
-              sell_t.parentNode.parentNode.removeChild(sell_t.parentNode);
+                let sell_t = document.getElementById(obj_id).getElementsByClassName("sell_time")[0];
+                sell_t.parentNode.parentNode.removeChild(sell_t.parentNode);
 
-            if(showSell){
-              let sell_b = document.getElementById(obj_id).getElementsByClassName("sell_NFTree")[0];
-              sell_b.parentNode.parentNode.removeChild(sell_b.parentNode);
+              if(showSell){
+                let sell_b = document.getElementById(obj_id).getElementsByClassName("sell_NFTree")[0];
+                sell_b.parentNode.parentNode.removeChild(sell_b.parentNode);
+              }
+              if(onlyBuyable){
+                let a = document.getElementById(obj_id)
+                a.parentNode.removeChild(a)                
+              }
             }
-          }
+          } catch {}
         });
 
         nftContrat.ownerOf(id).then((val) => { 
+          insertValue(obj_id, "own_value", val)
           if(showSell && val != currentAccount){
             try {
               let sell_b = document.getElementById(obj_id).getElementsByClassName("sell_NFTree")[0];
               sell_b.parentNode.parentNode.removeChild(sell_b.parentNode);
+
             } catch {}
           }
         })
 
         nftContrat.firstOwner(id).then((val) => { 
+          val = val.toLowerCase()
           if(showBurn && val != currentAccount){
             try {
               let burn_b = document.getElementById(obj_id).getElementsByClassName("burn_NFTree")[0];
@@ -244,6 +256,27 @@ function App() {
             } catch {}
           }
         })
+
+        nftContrat.ownerOf(id).then((val) => {
+            console.log("NFTContract " + id + " exists")
+            val = val.toLowerCase()
+            // en vente mais le votre, on empeche l'achat
+            if(val == currentAccount){
+              try{
+                let buy_b = document.getElementById(obj_id).getElementsByClassName("buy_NFTree")[0];
+                buy_b.parentNode.removeChild(buy_b)
+              } catch {}
+            }
+            if(onlyAddress != "ALL" && onlyAddress != val){
+              let a = document.getElementById(obj_id)
+              a.parentNode.removeChild(a)              
+            } 
+          }, (raison) => {
+            // si le token existe pas ne l'affiche pas
+            let a = document.getElementById(obj_id)
+            a.parentNode.removeChild(a)
+        });
+
 
       }
       
@@ -255,6 +288,8 @@ function App() {
       <fieldset className="NFTreeUnit" id={obj_id}>
         <ul> 
           <div>
+            <li>NFTree #{id}</li>
+            <li>Propriétaire (addresse) :</li><div className="own_value"></div><br/>
             <li>Numéro de parcelle :&nbsp;<div className="np_value"></div></li>
             <li>Taille de la parcelle (en km2) :&nbsp;<div className="s_value"></div></li>
             <li>Geolocalisation :&nbsp;<div className="geo_value"></div></li>
@@ -275,30 +310,119 @@ function App() {
   }
 
 
+  const ListMyNFTree_bcl = (address, usage, total) => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
+
+        for(let i = 0; i < total; i++){
+          nftContrat.tokenOfOwnerByIndex(address, i).then((val) => { 
+            let res = ShowNFTree(val, usage);
+              console.log(res)
+            document.getElementsByClassName("NftreeList")[0].appendChild(res)
+          });
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const ListMyNFTree_ini = (address, usage) => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
+
+        nftContrat.balanceOf(address).then((val) => { ListMyNFTree_bcl(address, val) });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+
   const ListMyNFTrees_redirect = () => {
     if(!currentAccount){
       alert("Please connect yourself with the button on the top-right hand corner")
       window.location.replace("../");
     } else {
-      window.location.replace("./" + currentAccount);
+      window.location.replace("./myNFTrees/" + currentAccount);
     }
   }
 
   const NFTreeMarket = () => {
-    return <div><h1>Page des NFTrees en ventes</h1></div>
+    return (<div className="NFTreeList_market">
+        {ShowNFTree_bcl(10, "market", true)}
+      </div>);
   }
 
   const SellMyNFTree = () => {
+    const [formData, setFormData] = useReducer(formReducer, {});
+    const [submitting, setSubmitting] = useState(false);
     // mapping(uint => uint256) public sellingPrice;
     // mapping(uint => uint256) public inSaleUntil;
+
+    const handleChange2 = e => {
+      
+      setFormData({
+        number: e.target.number,
+        geoloc: e.target.geoloc,
+        size: e.target.size,
+        horizon: e.target.horizon,
+      });
+    }
+
+    const handleSubmit2 = e => {
+      e.preventDefault();
+      let price = e.target.SellingPrice.value * 10 ** 9;
+      let dateTs = Date.parse(e.target.inSaleUntil.value) / 1000;
+      try {
+        const { ethereum } = window;
+  
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
+          nftContrat.setOnSale(e.target.tokenId.value, price, dateTs).then((val) => {
+            alert('Votre NFT est bien en vente')
+          })
+          //function setOnSale(uint256 tokenId, uint256 price, uint256 untilDate)
+        }
+      } catch (err) {
+        console.log(err);
+      }
+      alert('Formulaire envoyé avec : SellingPrice = ' + price + " | maxSellDate = " + dateTs)
+    }
 
     const location = useLocation();
     let path_words = location.pathname.split("/");
     let id = path_words[path_words.length - 1];
     return (
     <div>
-      <h1>Page du NFTree {id}</h1>
+      <h1>Page du NFTree #{id}</h1>
       <div>{ShowNFTree(id, "none")}</div>
+      <form onSubmit={handleSubmit2}>
+            <fieldset className="form">
+            <label> Id du Token :
+                <input className="greyId" name="tokenId" type="text" readOnly value={id} />
+              </label>
+              <label> Prix de vente de votre NFT (en ETH) :
+                <input name="SellingPrice" type="number" step="0.00001" onChange={handleChange2} />
+              </label>
+              <label> Date de vente maximum :
+                <input name="inSaleUntil" type="datetime-local"  onChange={handleChange2} />
+              </label>
+            </fieldset>
+            <button  on className="cta-button SellButton" type="submit">Vendre mon NFT</button>
+          </form>
       
     </div>)
   }
@@ -377,6 +501,14 @@ function App() {
       )
     }
 
+    const ShowNFTree_bcl = (id_to, usage, onlyBuyable, onlyAddress) => {
+      let res = [];
+      for(let i = 0; i < id_to; i++){
+        res[i] = ShowNFTree(i, usage, onlyBuyable, onlyAddress)
+      }
+      return res;
+    }
+
     const ListMyNFTrees = () => {
       const location = useLocation();
       let path_words = location.pathname.split("/");
@@ -394,10 +526,14 @@ function App() {
       } catch (err) {
         console.log(err);
       }
-      return <div>
-        <h1>Fake Nefturians tokens for {address}</h1>
-        <div id="FakeNeftList"></div>
-      </div>
+      return (
+        <div >
+          <h1>Ici, vous pouvez consulter vos NFT </h1><h3>(addresse : {address})</h3>
+          <div className="NFTreeList_market">
+            {ShowNFTree_bcl(10, "myNFTrees", false, address)}
+          </div>
+        </div>
+      )
     }
 
 
@@ -419,7 +555,7 @@ function App() {
             <Route exact path="/" element={<Home />} />
             <Route exact path="/market/" element={<NFTreeMarket />} />
             <Route exact path="/newNFTree/" element={<NewNFTree />} />
-            <Route exact path="/myNFTrees" element={<ListMyNFTrees_redirect />} />
+            <Route exact path="/myNFTrees/" element={<ListMyNFTrees_redirect />} />
             <Route exact path="/myNFTrees/:address" element={<ListMyNFTrees />} />
             <Route exact path="/myNFTrees/sell/:id" element={<SellMyNFTree />} />
           </Routes>

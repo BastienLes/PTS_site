@@ -23,6 +23,14 @@ nav a{
   text-align: left;
 }
 
+.NftreeList{
+  text-align: left;
+}
+
+.greyId{
+  background: #999999 !important;
+}
+
 .Aboutus h1{
   color: #3CA01E;
 }
@@ -93,11 +101,16 @@ h1{
   color: #F5F5F5;
   padding-bottom: 20px;
 }
+h3{
+  color: #F5F5F5;
+  padding-bottom: 20px;
+}
 
 span{
   color: #F5F5F5;
   padding-bottom: 20px;
 }
+
 
 .cta-button {
     padding: 8px;
@@ -123,6 +136,7 @@ span{
 .mint-nft-button {
     background: orange;
 }
+
 
 .nav-main {
   display: flex;
@@ -191,6 +205,25 @@ fieldset {
     background-color: rgb(255, 255, 255);
 }
 
+.SellButton{
+  background-color: #3CA01E;
+  padding: 8px;
+  border: none;
+  border-radius: 12px;
+  min-width: 150px;
+  height: 50px;
+  margin-top: 4vh;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.SellButton:hover{
+  background-size: 100% 100%;
+  animation: spring 300ms ease-out;
+	font-weight: bold;
+}
+
 .buttton{
   margin-top: 4vh;
   padding: 1vh;
@@ -213,8 +246,8 @@ fieldset {
 .NFTreeUnit {
   margin : 15px;
   padding : 30px;
-  width: 350px;
-  height: 350px;
+  width: 400px;
+  height: 400px;
   border-radius: 20px;
   background-color : lightgrey;
 }
@@ -242,6 +275,13 @@ fieldset {
 }
 
 .actionButtons{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+
+.NFTreeList_market {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
