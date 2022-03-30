@@ -265,7 +265,7 @@ fieldset {
 }
 
 .buy_NFTree {
-  background-color: lightgreen;
+  background-color: rgb(100, 200, 130);
 }
 .sell_NFTree {
   background-color: deepskyblue;

@@ -132,7 +132,7 @@ function App() {
 
   const redirectToSell = (e) => {
     let id = e.target.parentNode.parentNode.parentNode.parentNode.id.split("#")[1]
-    window.location.replace("./sell/" + id);
+    window.location.replace("./myNFTrees/sell/" + id);
   }
 
   const burnNFTree = async (e) => {
@@ -184,12 +184,6 @@ function App() {
           val = val.toLocaleString('default', { month: 'long' }) + " " + val.getFullYear()
           insertValue(obj_id, "hc_value", val) 
         });
-        nftContrat.sellingPrice(id).then((val) => { insertValue(obj_id, "sell_price", val / 10 ** 9) });
-        nftContrat.inSaleUntil(id).then((val) => {
-          val = new Date(val*1000)
-          val = val.getDay() + " " + val.toLocaleString('default', { month: 'long' }) + " " + val.getFullYear()
-          insertValue(obj_id, "sell_time", val)
-        });
         nftContrat.isOnSale(id).then((val) => { 
           try{
             insertValue(obj_id, "sell_bool", val ? "Oui" : "Non");
@@ -200,21 +194,28 @@ function App() {
                 let sell_t = document.getElementById(obj_id).getElementsByClassName("sell_time")[0];
                 sell_t.parentNode.parentNode.removeChild(sell_t.parentNode);
 
+                if(onlyBuyable){
+                  let a = document.getElementById(obj_id)
+                  a.parentNode.removeChild(a)                
+                }
+            } else {
               if(showSell){
                 let sell_b = document.getElementById(obj_id).getElementsByClassName("sell_NFTree")[0];
                 sell_b.parentNode.parentNode.removeChild(sell_b.parentNode);
               }
-              if(onlyBuyable){
-                let a = document.getElementById(obj_id)
-                a.parentNode.removeChild(a)                
-              }
             }
           } catch {}
+        });
+        nftContrat.sellingPrice(id).then((val) => { insertValue(obj_id, "sell_price", val / 10 ** 9) });
+        nftContrat.inSaleUntil(id).then((val) => {
+          val = new Date(val*1000)
+          val = val.getDay() + " " + val.toLocaleString('default', { month: 'long' }) + " " + val.getFullYear()
+          insertValue(obj_id, "sell_time", val)
         });
 
         nftContrat.ownerOf(id).then((val) => { 
           insertValue(obj_id, "own_value", val)
-          if(showSell && val != currentAccount){
+          if(!showSell && val != currentAccount){
             try {
               let sell_b = document.getElementById(obj_id).getElementsByClassName("sell_NFTree")[0];
               sell_b.parentNode.parentNode.removeChild(sell_b.parentNode);
@@ -224,16 +225,9 @@ function App() {
         })
 
         nftContrat.firstOwner(id).then((val) => { 
-          if(id == 4){
-            console.log("addresse ini : " + val)
-            console.log("addresse curr: " + currentAccount)
-          }
           val = val.toLowerCase()
           if(showBurn && val != currentAccount){
             try {
-              if(id == 4){
-                console.log("ozHGJosEGKSoFOHJS")
-              }
               let burn_b = document.getElementById(obj_id).getElementsByClassName("burn_NFTree")[0];
               burn_b.parentNode.parentNode.removeChild(burn_b.parentNode);
             } catch {}
@@ -241,7 +235,7 @@ function App() {
         })
 
         nftContrat.ownerOf(id).then((val) => {
-            console.log("NFTContract " + id + " exists")
+            // console.log("NFTContract " + id + " exists")
             val = val.toLowerCase()
             // en vente mais le votre, on empeche l'achat
             if(val == currentAccount){
@@ -324,7 +318,7 @@ function App() {
       });
     }
 
-    const handleSubmit2 = e => {
+    const handleSubmit2 = async e => {
       e.preventDefault();
       let price = e.target.SellingPrice.value * 10 ** 9;
       let dateTs = Date.parse(e.target.inSaleUntil.value) / 1000;
@@ -335,15 +329,14 @@ function App() {
           const provider = new ethers.providers.Web3Provider(ethereum);
           const signer = provider.getSigner();
           const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
-          nftContrat.setOnSale(e.target.tokenId.value, price, dateTs).then((val) => {
-            alert('Votre NFT est bien en vente')
-          })
-          //function setOnSale(uint256 tokenId, uint256 price, uint256 untilDate)
+          let nftTxn = await nftContrat.setOnSale(e.target.tokenId.value, price, dateTs);
+          await nftTxn.wait();
+          alert('Votre NFT est bien en ventre pour ' + price + " eth jusqu'au " + dateTs);
         }
       } catch (err) {
         console.log(err);
       }
-      alert('Formulaire envoyé avec : SellingPrice = ' + price + " | maxSellDate = " + dateTs)
+      
     }
 
     const location = useLocation();
