@@ -10,9 +10,13 @@ import emailjs from '@emailjs/browser';
 
 
 import NFTree_contract from './contracts/NFTree_contract_abi.json';
-const NFTree_contract_abi = NFTree_contract.abi;
+import NFTree_erc20 from './contracts/NFTree_ERC20_abi.json';
 
-const NFTree_contract_address = "0xD1cb90f8117933e111B7351389961AF6a4fDa1d2";
+const NFTree_contract_abi = NFTree_contract.abi;
+const NFTree_erc20_abi = NFTree_erc20.abi;
+
+const NFTree_contract_address = "0x659Ac6479DeB71064e326CbAED3B314AbB57d302";
+const NFTree_erc20_address = "0x145F6d78f19222085f60c0e3ff9aC2a4a1a45ca9";
 
 
 let mintPrice = undefined;
@@ -156,6 +160,28 @@ function App() {
     }
   }
 
+
+  const buyNFTree = async (e) => {
+    let id = e.target.parentNode.parentNode.parentNode.parentNode.id.split("#")[1]
+
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const nftContrat = new ethers.Contract(NFTree_erc20_address, NFTree_erc20_abi, signer);
+
+        let nftTxn = await nftContrat.buyToken(id, {value: ethers.utils.parseEther("1.0")})
+        // await nftTxn.wait();
+        // alert("Votre NFT a bien été burn");
+        // window.location.replace("../");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   const ShowNFTree = (id, usage, onlyBuyable = false, onlyAddress = "ALL") => {
     let obj_id = "NFTree#" + id;
 
@@ -278,7 +304,7 @@ function App() {
           <div className="actionButtons">
             {showSell ? <li><button type="button" className="cta-button sell_NFTree" onClick={redirectToSell}>Vendre</button></li> : ""}
             {showBurn ? <li><button type="button" className="cta-button burn_NFTree" onClick={burnNFTree}>Burn</button></li> : ""}
-            {showBuy ? <li><button type="button" className="cta-button buy_NFTree">Acheter</button></li> : ""}
+            {showBuy ? <li><button type="button" className="cta-button buy_NFTree" onClick={buyNFTree}>Acheter</button></li> : ""}
           </div>
           {}
         </ul>
