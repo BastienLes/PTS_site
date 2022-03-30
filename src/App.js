@@ -15,8 +15,8 @@ import NFTree_erc20 from './contracts/NFTree_ERC20_abi.json';
 const NFTree_contract_abi = NFTree_contract.abi;
 const NFTree_erc20_abi = NFTree_erc20.abi;
 
-const NFTree_contract_address = "0x659Ac6479DeB71064e326CbAED3B314AbB57d302";
-const NFTree_erc20_address = "0x145F6d78f19222085f60c0e3ff9aC2a4a1a45ca9";
+const NFTree_contract_address = "0x2E8a2AC06bcb99A0Cbe03247d6429bCa6128CeB2";
+const NFTree_erc20_address = "0x6CdfFc313F6f7647E180d9EA15ffC2CE04015F90";
 
 
 let mintPrice = undefined;
@@ -44,7 +44,6 @@ function App() {
 
     try {
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-      console.log("Found an annount! Address : ", accounts[0]);
       setCurrentAccount(accounts[0]);
     } catch (err) {
       console.log(err)
@@ -170,12 +169,15 @@ function App() {
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
-        const nftContrat = new ethers.Contract(NFTree_erc20_address, NFTree_erc20_abi, signer);
-
-        let nftTxn = await nftContrat.buyToken(id, {value: ethers.utils.parseEther("1.0")})
+        const erc20_contract = new ethers.Contract(NFTree_erc20_address, NFTree_erc20_abi, signer);
+        let price = e.target.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("sell_price")[0].innerHTML
+        // price = ethers.utils.parseEther(price)
+        price = price * (10 ** 9)
+        console.log(price)
+        erc20_contract.buyToken(id, price).then(console.log);
+        // let nftTxn = await erc20_contract.buyToken(id, {value: val});
         // await nftTxn.wait();
-        // alert("Votre NFT a bien été burn");
-        // window.location.replace("../");
+        // alert("Félicitation, vous avez acheté ce NFTree");
       }
     } catch (err) {
       console.log(err);
@@ -324,7 +326,7 @@ function App() {
 
   const NFTreeMarket = () => {
     return (<div className="NFTreeList_market">
-        { ShowNFTree_bcl(10, "market", true) }
+        { ShowNFTree_bcl(1, "market", true) }
       </div>);
   }
 

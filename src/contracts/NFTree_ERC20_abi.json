@@ -129,11 +129,16 @@
 					"internalType": "uint256",
 					"name": "tokenId",
 					"type": "uint256"
+				},
+				{
+					"internalType": "uint256",
+					"name": "price",
+					"type": "uint256"
 				}
 			],
 			"name": "buyToken",
 			"outputs": [],
-			"stateMutability": "payable",
+			"stateMutability": "nonpayable",
 			"type": "function"
 		},
 		{
