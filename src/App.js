@@ -12,7 +12,7 @@ import emailjs from '@emailjs/browser';
 import NFTree_contract from './contracts/NFTree_contract_abi.json';
 const NFTree_contract_abi = NFTree_contract.abi;
 
-const NFTree_contract_address = "0xfe862e541c3610cf8dd000ce96038402e65a9f63";
+const NFTree_contract_address = "0xD1cb90f8117933e111B7351389961AF6a4fDa1d2";
 
 
 let mintPrice = undefined;
@@ -122,33 +122,6 @@ function App() {
   const ListFakeNeftDesc = (i, val) => {
     console.log("ListFakeNeftDesc(", i, ", ", val, ")")
   }
-
-
-  const ListMyNFT_i = (address, total) => {
-    try {
-      const { ethereum } = window;
-      total = parseInt(total)
-
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
-
-        let obj = document.getElementById("FakeNeftList");
-        let div_p = document.createElement("div");
-        for (let i = 0; i < total; i++) {
-          let div = document.createElement("div");
-          div.id = "FakeNeftList-" + i;
-          div.className = "FakeNeftList_unit";
-          div_p.appendChild(div)
-          nftContrat.tokenOfOwnerByIndex(address, i).then((val) => { ListFakeNeftDesc(i, val); });
-        }
-        obj.replaceChildren(div_p)
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
   
   const insertValue = (id, clss, val) => {
     if(val == "") val = "undefined"
@@ -162,7 +135,7 @@ function App() {
     window.location.replace("./sell/" + id);
   }
 
-  const burnNFTree = (e) => {
+  const burnNFTree = async (e) => {
     let id = e.target.parentNode.parentNode.parentNode.parentNode.id.split("#")[1]
 
     try {
@@ -173,7 +146,10 @@ function App() {
         const signer = provider.getSigner();
         const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
 
-        // nftContrat.burn(id).then((val) => { insertValue(obj_id, "np_value", val) });
+        let nftTxn = await nftContrat.burn(id)
+        await nftTxn.wait();
+        alert("Votre NFT a bien été burn");
+        window.location.replace("../");
       }
     } catch (err) {
       console.log(err);
@@ -248,9 +224,16 @@ function App() {
         })
 
         nftContrat.firstOwner(id).then((val) => { 
+          if(id == 4){
+            console.log("addresse ini : " + val)
+            console.log("addresse curr: " + currentAccount)
+          }
           val = val.toLowerCase()
           if(showBurn && val != currentAccount){
             try {
+              if(id == 4){
+                console.log("ozHGJosEGKSoFOHJS")
+              }
               let burn_b = document.getElementById(obj_id).getElementsByClassName("burn_NFTree")[0];
               burn_b.parentNode.parentNode.removeChild(burn_b.parentNode);
             } catch {}
@@ -300,7 +283,7 @@ function App() {
           </div>
           <div className="actionButtons">
             {showSell ? <li><button type="button" className="cta-button sell_NFTree" onClick={redirectToSell}>Vendre</button></li> : ""}
-            {showBurn ? <li><button type="button" className="cta-button burn_NFTree">Burn</button></li> : ""}
+            {showBurn ? <li><button type="button" className="cta-button burn_NFTree" onClick={burnNFTree}>Burn</button></li> : ""}
             {showBuy ? <li><button type="button" className="cta-button buy_NFTree">Acheter</button></li> : ""}
           </div>
           {}
@@ -310,57 +293,18 @@ function App() {
   }
 
 
-  const ListMyNFTree_bcl = (address, usage, total) => {
-    try {
-      const { ethereum } = window;
-
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
-
-        for(let i = 0; i < total; i++){
-          nftContrat.tokenOfOwnerByIndex(address, i).then((val) => { 
-            let res = ShowNFTree(val, usage);
-              console.log(res)
-            document.getElementsByClassName("NftreeList")[0].appendChild(res)
-          });
-        }
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  const ListMyNFTree_ini = (address, usage) => {
-    try {
-      const { ethereum } = window;
-
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
-
-        nftContrat.balanceOf(address).then((val) => { ListMyNFTree_bcl(address, val) });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-
   const ListMyNFTrees_redirect = () => {
     if(!currentAccount){
       alert("Please connect yourself with the button on the top-right hand corner")
       window.location.replace("../");
     } else {
-      window.location.replace("./myNFTrees/" + currentAccount);
+      return ListMyNFTrees(currentAccount);
     }
   }
 
   const NFTreeMarket = () => {
     return (<div className="NFTreeList_market">
-        {ShowNFTree_bcl(10, "market", true)}
+        { ShowNFTree_bcl(10, "market", true) }
       </div>);
   }
 
@@ -509,28 +453,18 @@ function App() {
       return res;
     }
 
-    const ListMyNFTrees = () => {
+    const ListMyNFTrees = (address = null) => {
       const location = useLocation();
-      let path_words = location.pathname.split("/");
-      let address = path_words[path_words.length - 1]
-      try {
-        const { ethereum } = window;
-
-        if (ethereum) {
-          const provider = new ethers.providers.Web3Provider(ethereum);
-          const signer = provider.getSigner();
-          const nftContrat = new ethers.Contract(NFTree_contract_address, NFTree_contract_abi, signer);
-
-          nftContrat.balanceOf(address).then((val) => { ListMyNFT_i(address, val) })
-        }
-      } catch (err) {
-        console.log(err);
+      if(address == null){
+        let path_words = location.pathname.split("/");
+        let address = path_words[path_words.length - 1]
       }
+
       return (
         <div >
           <h1>Ici, vous pouvez consulter vos NFT </h1><h3>(addresse : {address})</h3>
           <div className="NFTreeList_market">
-            {ShowNFTree_bcl(10, "myNFTrees", false, address)}
+            { ShowNFTree_bcl(10, "myNFTrees", false, address) }
           </div>
         </div>
       )
